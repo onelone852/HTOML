@@ -1,6 +1,6 @@
 # HTOML
 
-**HTOML**, also known as HyperText Obvious Language, is a translator that translate valid TOML file to HTML. This project is in development and also not production-ready.
+**HTOML**, also known as HyperText Obvious Language, is a translator written in Rust that translate valid TOML file to HTML. This project is in development and also not production-ready.
 
 ## Getting started
 
