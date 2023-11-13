@@ -1,3 +1,4 @@
+mod arg;
 mod error;
 mod html;
 mod htoml;

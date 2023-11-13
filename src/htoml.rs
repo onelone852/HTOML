@@ -1,5 +1,7 @@
 use toml::{Table, Value};
 
+use crate::arg::Argument;
+
 use super::{
     error::{HtomlError, Result},
     html::Html,
@@ -49,6 +51,23 @@ impl Htoml {
         Ok(())
     }
 
+    fn parse_a_element(html: &mut Html, a: &Table, elem_cont: &Value) -> Result<()> {
+        let href = a
+            .get("href")
+            .and_then(|val| val.as_str())
+            .ok_or(HtomlError::AWithoutHref)?;
+        html.open_elem_with_args(
+            "a",
+            &[Argument {
+                name: "href",
+                val: href,
+            }],
+        );
+        Self::parse_element(html, elem_cont)?;
+        html.close_elem("a");
+        Ok(())
+    }
+
     fn parse_element(html: &mut Html, elem: &Value) -> Result<()> {
         if let Value::String(s) = elem {
             html.push(s);
@@ -66,6 +85,7 @@ impl Htoml {
                     html.close_elem(real);
                 }
                 void if VOID_ELEMENT.contains(&void) => html.insert_void_elem(void),
+                "a" => Self::parse_a_element(html, table, elem_cont?)?,
                 _ => return Err(HtomlError::UnknownElement(elem_type.to_string())),
             };
         } else if let Value::Array(arr) = elem {
@@ -80,7 +100,17 @@ impl Htoml {
 
     fn parse_body(&mut self) -> Result<()> {
         let raw_body = self.toml.get("body");
-        self.html.open_elem("body");
+        let lang = self.toml.get("lang");
+        let mut args: Vec<Argument> = Vec::with_capacity(1);
+        if let Some(Value::String(s)) = lang {
+            args.push(Argument {
+                name: "lang",
+                val: s,
+            });
+        } else if let Some(_) = lang {
+            return Err(HtomlError::NonStrLang);
+        }
+        self.html.open_elem_with_args("body", &args);
         if let Some(body) = raw_body {
             Self::parse_element(&mut self.html, body)?;
         }

@@ -14,4 +14,6 @@ pub enum HtomlError {
     UntypedElement,
     NoContent,
     UnknownContent,
+    NonStrLang,
+    AWithoutHref,
 }
