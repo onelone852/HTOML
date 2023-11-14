@@ -38,4 +38,3 @@ It should noticed that HTOML and HTOML protocol is two separated things. **HTOML
 
 HTOML (also include HTOML protocol) is created under the MIT License. Please see `LICENSE` file for more inforamtion.
 
-
