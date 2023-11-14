@@ -22,21 +22,17 @@ It should noticed that HTOML and HTOML protocol is two separated things. **HTOML
 
 ## Currently support
 
-1. Some HTML elements:
+1. Some HTML elements
 
-- Simple elements:
-    - p
-    - b
-    - i
-    - strong
-    - mark
-    - u 
-    - s
-    - small
-- Simple head elements:
-    - title
-- Lang in body element
-- Element `a`
+    - Most of the non-empty/void elements
+    - Simple empty/void elements:
+        - br
+        - hr
+    - Simple head elements:
+        - title
+    - Element `a` with `href` attribute 
+
+2. HTML version and `lang` attribute for `body` element
 
 ## LICENSE
 
