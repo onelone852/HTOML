@@ -50,19 +50,6 @@ impl Htoml {
         Ok(())
     }
 
-    fn parse_a_element<'a>(attrs: &mut Vec<Argument<'a>>, a: &'a Table) -> Result<()> {
-        let href = a
-            .get("href")
-            .and_then(|val| val.as_str())
-            .ok_or(HtomlError::AWithoutHref)?;
-        attrs.push(Argument {
-            name: "href",
-            val: href,
-        });
-
-        Ok(())
-    }
-
     fn parse_class_and_id<'a>(
         attrs: &mut Vec<Argument<'a>>,
         elem: &'a Table,
@@ -96,9 +83,27 @@ impl Htoml {
                 val: id_str,
             });
         } else if let Some(_) = id {
-            return Err(HtomlError::NonStringID);
+            return Err(HtomlError::NonStringAttr("id".to_string()));
         }
 
+        Ok(())
+    }
+
+    fn parse_other_attr<'a>(attrs: &mut Vec<Argument<'a>>, table: &'a Table) -> Result<()> {
+        for attr in table.iter() {
+            match attr.0.as_str() {
+                "class" | "id" | "cont" | "type" => continue,
+                attr_name => {
+                    attrs.push(Argument {
+                        name: attr_name,
+                        val: attr
+                            .1
+                            .as_str()
+                            .ok_or_else(|| HtomlError::NonStringAttr(attr_name.to_string()))?,
+                    });
+                }
+            }
+        }
         Ok(())
     }
 
@@ -113,11 +118,9 @@ impl Htoml {
                 .as_str()
                 .ok_or(HtomlError::UntypedElement)?;
             let mut attrs = Vec::new();
-            if elem_type == "a" {
-                Self::parse_a_element(&mut attrs, table)?;
-            }
             let mut class_str = String::new();
             Self::parse_class_and_id(&mut attrs, table, &mut class_str)?;
+            Self::parse_other_attr(&mut attrs, table)?;
             match elem_type {
                 void if VOID_ELEMENT.contains(&void) => html.insert_void_elem(void),
                 real => {

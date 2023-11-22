@@ -14,10 +14,9 @@ pub enum HtomlError {
     NonTableHead,
     UnknownHead(String),
     UnknownClass,
-    NonStringID,
+    NonStringAttr(String),
     UntypedElement,
     NoContent,
     UnknownContent,
     NonStrLang,
-    AWithoutHref,
 }
