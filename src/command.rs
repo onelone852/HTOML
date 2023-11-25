@@ -3,16 +3,19 @@ use std::{
     str::FromStr,
 };
 
-use crate::htoml::Htoml;
-
-use super::error::{HtomlError, Result};
+use super::{
+    error::{HtomlError, Result},
+    htoml::Htoml,
+};
 
 pub enum Command {
     Compile { path: PathBuf },
+    Help,
 }
 
 enum CommandType {
     TCompile,
+    THelp,
 }
 
 impl FromStr for CommandType {
@@ -22,6 +25,7 @@ impl FromStr for CommandType {
         use CommandType::*;
         match s {
             "compile" | "cp" | "c" => Ok(TCompile),
+            "h" | "help" => Ok(THelp),
             _ => Err(s.to_string()),
         }
     }
@@ -44,6 +48,7 @@ impl Command {
                     path: Path::new(file).to_path_buf(),
                 })
             }
+            THelp => Ok(Help),
         }
     }
 
@@ -56,6 +61,10 @@ impl Command {
                 let output = htoml.parse()?;
                 path.set_extension("html");
                 std::fs::write(path, output).or(Err(HtomlError::WriteFileError))?;
+                Ok(())
+            }
+            Help => {
+                println!("Usage: htoml [command] [args...]\nCommands:\n h / help - Show this help message\n c / cp / compile - Compile a valid TOML file to HTML\n  Args:\n   arg1： File that is going to be compiled");
                 Ok(())
             }
         }
